@@ -215,38 +215,10 @@ class ExifOutputStream extends FilterOutputStream {
     }
 
     private void writeExifData() throws IOException {
-        if (mExifData == null) {
-            return;
-        }
         if (DEBUG) {
-            Log.v(TAG, "Writing exif data...");
+            Log.v(TAG, "Not writing exif data...");
         }
-        ArrayList<ExifTag> nullTags = stripNullValueTags(mExifData);
-        createRequiredIfdAndTag();
-        int exifSize = calculateAllOffset();
-        if (exifSize + 8 > MAX_EXIF_SIZE) {
-            throw new IOException("Exif header is too large (>64Kb)");
-        }
-        OrderedDataOutputStream dataOutputStream = new OrderedDataOutputStream(out);
-        dataOutputStream.setByteOrder(ByteOrder.BIG_ENDIAN);
-        dataOutputStream.writeShort(JpegHeader.APP1);
-        dataOutputStream.writeShort((short) (exifSize + 8));
-        dataOutputStream.writeInt(EXIF_HEADER);
-        dataOutputStream.writeShort((short) 0x0000);
-        if (mExifData.getByteOrder() == ByteOrder.BIG_ENDIAN) {
-            dataOutputStream.writeShort(TIFF_BIG_ENDIAN);
-        } else {
-            dataOutputStream.writeShort(TIFF_LITTLE_ENDIAN);
-        }
-        dataOutputStream.setByteOrder(mExifData.getByteOrder());
-        dataOutputStream.writeShort(TIFF_HEADER);
-        dataOutputStream.writeInt(8);
-        writeAllTags(dataOutputStream);
-        writeThumbnail(dataOutputStream);
-        for (ExifTag t : nullTags) {
-            mExifData.addTag(t);
-        }
-        mSize += dataOutputStream.size();
+            return;
     }
 
     private ArrayList<ExifTag> stripNullValueTags(ExifData data) {
